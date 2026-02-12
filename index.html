@@ -11,18 +11,16 @@
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
 
     <style>
-        /* 冬日風格全局設定 */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { 
             font-family: 'Noto Sans TC', 'Poppins', sans-serif; 
-            /* 換成冬日藍白漸層 */
             background: linear-gradient(135deg, #E0F2FE 0%, #F0F9FF 100%); 
-            color: #334155; 
+            color: #475569; /* 舒壓的深灰藍 */
             min-height: 100vh; 
         }
         .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
         
-        /* Header 改為冰晶藍漸層 */
+        /* 標題區：棉花糖藍 */
         .header { 
             text-align: center; 
             padding: 40px 20px; 
@@ -31,52 +29,39 @@
             box-shadow: 0 4px 20px rgba(56, 189, 248, 0.2); 
             margin-bottom: 30px; 
         }
-        .header h1 { font-size: 2.2rem; font-weight: 700; color: white; text-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .header h1 { font-size: 2.2rem; font-weight: 700; color: white; text-shadow: 0 2px 4px rgba(0,0,0,0.05); }
 
-        .section-card { background: rgba(255, 255, 255, 0.9); padding: 25px; border-radius: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 25px; }
+        /* 卡片：從粉紅改為粉藍 */
+        .section-card { background: white; padding: 25px; border-radius: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); margin-bottom: 25px; }
         
+        /* 搜尋框與按鈕 */
         .search-input { width: 100%; padding: 12px 20px; border: 2px solid #E0F2FE; border-radius: 15px; margin-bottom: 15px; outline: none; transition: 0.3s; }
-        .search-input:focus { border-color: #7DD3FC; box-shadow: 0 0 10px rgba(125, 211, 252, 0.2); }
+        .search-input:focus { border-color: #7DD3FC; }
         
-        /* 過濾按鈕改為藍色 */
-        .filter-btn { padding: 8px 18px; border: 2px solid #7DD3FC; background: white; color: #0EA5E9; border-radius: 25px; cursor: pointer; transition: all 0.3s; font-weight: 600; font-size: 0.9rem; }
-        .filter-btn.active { background: #0EA5E9; color: white; border-color: #0EA5E9; }
+        .filter-btn { padding: 8px 18px; border: 2px solid #7DD3FC; background: white; color: #0EA5E9; border-radius: 25px; cursor: pointer; transition: 0.3s; font-weight: 600; }
+        .filter-btn.active { background: #7DD3FC; color: white; }
 
-        .songs-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
-        .song-card { background: white; border-radius: 20px; padding: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.06); border: 2px solid transparent; transition: all 0.3s; display: flex; flex-direction: column; justify-content: space-between; }
-        .song-card:hover { transform: translateY(-5px); border-color: #7DD3FC; }
+        .song-card { background: white; border-radius: 20px; padding: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.04); border: 2px solid transparent; transition: 0.3s; }
+        .song-card:hover { border-color: #7DD3FC; }
         
-        /* 點歌按鈕改為藍青色漸層 */
-        .request-btn { width: 100%; padding: 12px; border: none; border-radius: 15px; background: linear-gradient(135deg, #0EA5E9 0%, #2DD4BF 100%); color: white; font-weight: 700; cursor: pointer; margin-top: 15px; transition: 0.3s; box-shadow: 0 4px 10px rgba(14, 165, 233, 0.3); }
+        /* 點歌按鈕 */
+        .request-btn { width: 100%; padding: 12px; border: none; border-radius: 15px; background: linear-gradient(135deg, #7DD3FC 0%, #38BDF8 100%); color: white; font-weight: 700; cursor: pointer; margin-top: 15px; box-shadow: 0 4px 10px rgba(125, 211, 252, 0.3); }
 
-        /* 演唱中狀態改為淺藍 */
-        .status-singing { background: #E0F2FE; color: #0284C7; animation: pulse 2s infinite; border-radius: 10px; padding: 4px 10px; font-weight: 600; }
-        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
-
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); z-index: 2000; justify-content: center; align-items: center; backdrop-filter: blur(8px); }
-        .modal.active { display: flex; }
-        .modal-content { background: white; border-radius: 25px; padding: 30px; max-width: 450px; width: 90%; }
-        .form-input { width: 100%; padding: 14px; border: 2px solid #F1F5F9; border-radius: 15px; margin-top: 10px; outline: none; }
-
-        .tag-chip { padding: 6px 15px; border: 2px solid #F1F5F9; border-radius: 20px; cursor: pointer; font-size: 0.85rem; transition: 0.3s; }
-        .tag-checkbox { display: none; }
-        .tag-checkbox:checked + .tag-chip { background: #0EA5E9; border-color: #0EA5E9; color: white; }
-
-        .toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: #334155; color: white; padding: 12px 30px; border-radius: 50px; display: none; z-index: 3000; }
-        .song-name { font-weight: 700; font-size: 1.1rem; color: #0F172A; }
+        /* 正在演唱標籤 */
+        .status-singing { background: #F0F9FF; color: #0EA5E9; animation: pulse 2s infinite; border-radius: 10px; padding: 4px 10px; font-weight: 600; }
     </style>
 </head>
 <body>
 
     <div class="header">
-        <h1 onclick="toggleMode()" style="cursor: default;">❄️ 卡妮娜冬日點歌系統 ♪</h1>
+        <h1 onclick="toggleMode()" style="cursor: default;">❄️ 魔女點歌系統 ♪</h1>
     </div>
 
     <div class="container">
         <div id="audienceView">
             <div class="section-card">
                 <h3 class="font-bold mb-3 text-sky-500 text-lg flex items-center">🎵 目前排隊清單</h3>
-                <div id="queueList" class="space-y-2 text-gray-400">正在呼喚雪精靈載入中...</div>
+                <div id="queueList" class="space-y-2 text-gray-400">正在呼喚使魔載入中...</div>
             </div>
 
             <div class="section-card bg-gray-50/50">
@@ -156,7 +141,7 @@
         <div class="modal-content text-center">
             <h3 class="text-xl font-bold mb-4">卡妮娜身份驗證</h3>
             <input type="password" id="adminPwd" class="form-input" placeholder="請輸入管理密碼">
-            <button class="request-btn" onclick="checkPwd()">進入冰晶後台</button>
+            <button class="request-btn" onclick="checkPwd()">進入後台</button>
         </div>
     </div>
 
@@ -356,7 +341,7 @@
                 document.getElementById('managementView').style.display = 'block';
                 document.getElementById('audienceView').style.display = 'none';
                 closeModals(); render();
-            } else { alert('雪地通行證錯誤 (密碼錯誤)'); }
+            } else { alert('密碼錯誤'); }
         }
         function openSongModal() { document.getElementById('songEditModal').classList.add('active'); }
         function closeModals() { document.querySelectorAll('.modal').forEach(m => m.classList.remove('active')); }
